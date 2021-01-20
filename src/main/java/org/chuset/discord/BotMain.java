@@ -8,6 +8,6 @@ public class BotMain {
     public static void main(String[] args) throws Exception {
         String jdaToken = System.getenv("JDA_TOKEN");
         JDA jda = JDABuilder.createDefault(jdaToken).build();
-        jda.addEventListener(new MessageListener(jda.getSelfUser(), new RespondMessageHandler()));
+        jda.addEventListener(new MessageListener(jda.getSelfUser(), new CalculatorMessageHandler()));
     }
 }
