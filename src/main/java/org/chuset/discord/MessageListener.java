@@ -22,7 +22,7 @@ public class MessageListener extends ListenerAdapter {
         System.out.println(event.getMessage().getContentRaw());
         System.out.println(event.getGuild().getName());
 
-        if(selfUser.getIdLong() != event.getAuthor().getIdLong()) {
+        if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             MessageChannel channel = event.getChannel();
             try {
                 channel.sendMessage(handler.handleMessage(event.getMessage().getContentRaw())).queue();
