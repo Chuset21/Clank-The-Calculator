@@ -27,7 +27,7 @@ public class MessageListener extends ListenerAdapter {
             try {
                 final String message = handler.handleMessage(event.getMessage().getContentRaw());
                 if (message.startsWith("$$")) {
-                    channel.sendMessage(message.replace("$$", "")).queue();
+                    channel.sendMessage(message.replace("$$", "").trim()).queue();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
