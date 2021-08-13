@@ -25,7 +25,10 @@ public class MessageListener extends ListenerAdapter {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             MessageChannel channel = event.getChannel();
             try {
-                channel.sendMessage(handler.handleMessage(event.getMessage().getContentRaw())).queue();
+                final String message = handler.handleMessage(event.getMessage().getContentRaw());
+                if (message.startsWith("$$")) {
+                    channel.sendMessage(message.replace("$$", "")).queue();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 channel.sendMessage("There was an error handling the message.").queue();
