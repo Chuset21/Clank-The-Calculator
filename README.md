@@ -1,6 +1,6 @@
 # Clank The Calculator
 
-A calculator bot for discord that can take in arithmetic expressions and evaluate them.  
+A calculator bot for Discord that can take in arithmetic expressions and evaluate them.  
 Clank supports addition, subtraction, multiplication, division, exponentiation, and other functions like __sqrt__,  __
 sin__, __cos__ and __tan__.
 
