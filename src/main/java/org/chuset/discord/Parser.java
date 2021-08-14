@@ -80,13 +80,13 @@ public class Parser {
         if (eat('(')) { // parentheses
             x = parseExpression();
             eat(')');
-        } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
-            while ((ch >= '0' && ch <= '9') || ch == '.') {
+        } else if (Character.isDigit(ch) || ch == '.') { // numbers
+            while (Character.isDigit(ch) || ch == '.') {
                 nextChar();
             }
             x = Double.parseDouble(str.substring(startPos, pos));
-        } else if (ch >= 'a' && ch <= 'z') { // functions
-            while (ch >= 'a' && ch <= 'z') {
+        } else if (Character.isLetter(ch)) { // functions
+            while (Character.isLetter(ch)) {
                 nextChar();
             }
             final String func = str.substring(startPos, pos);
