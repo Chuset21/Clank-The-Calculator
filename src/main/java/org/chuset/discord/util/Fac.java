@@ -10,7 +10,7 @@ public class Fac {
         if (n <= 1) {
             return 1;
         }
-        CACHE.putIfAbsent(n, factorial(n - 1));
+        CACHE.putIfAbsent(n, n * factorial(n - 1));
         return CACHE.get(n);
     }
 }
