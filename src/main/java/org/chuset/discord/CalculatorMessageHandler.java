@@ -1,5 +1,7 @@
 package org.chuset.discord;
 
+import org.chuset.discord.util.Parser;
+
 import java.util.Locale;
 
 public class CalculatorMessageHandler implements MessageTextHandler {
