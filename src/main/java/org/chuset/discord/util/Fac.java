@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Fac {
-    private static final Map<Long, Long> CACHE = new HashMap<>();
+    private static final Map<Long, Double> CACHE = new HashMap<>();
 
-    public static long factorial(final long n) {
+    public static double factorial(final long n) {
         if (n <= 1) {
             return 1;
         }
