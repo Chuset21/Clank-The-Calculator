@@ -24,6 +24,8 @@ public class MessageListener extends ListenerAdapter {
                 if (message.startsWith("$$")) {
                     channel.sendMessage(handler.handleMessage(message.replace("$$", "").trim())).queue();
                 }
+            } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
+                e.printStackTrace();
             } catch (Exception ignored) {
                 channel.sendMessage("There was an error handling the message.").queue();
             }
