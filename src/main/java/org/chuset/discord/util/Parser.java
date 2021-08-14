@@ -103,12 +103,12 @@ public class Parser {
             throw new RuntimeException("Unexpected: " + (char) ch);
         }
 
-        if (eat('^')) {
-            x = Math.pow(x, parseFactor()); // exponentiation
-        }
-
         if (eat('!')) {
             x = Fac.factorial(Math.round(x)); // factorial
+        }
+
+        if (eat('^')) {
+            x = Math.pow(x, parseFactor()); // exponentiation
         }
 
         return x;
