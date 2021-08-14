@@ -25,7 +25,7 @@ public class MessageListener extends ListenerAdapter {
                     channel.sendMessage(handler.handleMessage(message.replace("$$", "").trim())).queue();
                 }
             } catch (Exception ignored) {
-                channel.sendMessage("There was an error handling the message:").queue();
+                channel.sendMessage("There was an error handling the message.").queue();
             }
         }
     }
