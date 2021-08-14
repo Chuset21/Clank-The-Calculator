@@ -1,9 +1,11 @@
 package org.chuset.discord;
 
+import java.util.Locale;
+
 public class CalculatorMessageHandler implements MessageTextHandler {
     @Override
     public String handleMessage(final String message) {
-        return decimalFormatter(evaluateExpression(message));
+        return decimalFormatter(evaluateExpression(message.toLowerCase(Locale.ROOT)));
     }
 
     public static String decimalFormatter(final double number) {
