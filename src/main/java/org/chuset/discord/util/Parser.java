@@ -1,4 +1,4 @@
-package org.chuset.discord;
+package org.chuset.discord.util;
 
 public class Parser {
     private final String str;
@@ -56,7 +56,9 @@ public class Parser {
     private double parseTerm() {
         double x = parseFactor();
         while (true) {
-            if (eat('*')) {
+            if (eat('!')) {
+                x = Fac.factorial(Math.round(x)); // factorial
+            } else if (eat('*')) {
                 x *= parseFactor(); // multiplication
             } else if (eat('/')) {
                 x /= parseFactor(); // division
@@ -96,6 +98,7 @@ public class Parser {
                 case "sin" -> Math.sin(Math.toRadians(x));
                 case "cos" -> Math.cos(Math.toRadians(x));
                 case "tan" -> Math.tan(Math.toRadians(x));
+                case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
                 default -> throw new RuntimeException("Unknown function: " + func);
             };
         } else {
