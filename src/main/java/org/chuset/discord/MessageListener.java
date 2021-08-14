@@ -10,28 +10,22 @@ public class MessageListener extends ListenerAdapter {
     private final User selfUser;
     private final MessageTextHandler handler;
 
-    public MessageListener(User selfUser, MessageTextHandler handler) {
+    public MessageListener(final User selfUser, final MessageTextHandler handler) {
         this.selfUser = selfUser;
         this.handler = handler;
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        System.out.println(event.getAuthor().getName());
-        System.out.println(event.getMessage().getChannel().getName());
-        System.out.println(event.getMessage().getContentRaw());
-        System.out.println(event.getGuild().getName());
-
+    public void onMessageReceived(final MessageReceivedEvent event) {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
-            MessageChannel channel = event.getChannel();
+            final MessageChannel channel = event.getChannel();
             try {
-                final String message = handler.handleMessage(event.getMessage().getContentRaw());
+                final String message = event.getMessage().getContentRaw();
                 if (message.startsWith("$$")) {
-                    channel.sendMessage(message.replace("$$", "").trim()).queue();
+                    channel.sendMessage(handler.handleMessage(message.replace("$$", "").trim())).queue();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                channel.sendMessage("There was an error handling the message.").queue();
+            } catch (Exception ignored) {
+                channel.sendMessage("There was an error handling the message:").queue();
             }
         }
     }
