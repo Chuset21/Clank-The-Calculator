@@ -56,9 +56,7 @@ public class Parser {
     private double parseTerm() {
         double x = parseFactor();
         while (true) {
-            if (eat('!')) {
-                x = Fac.factorial(Math.round(x)); // factorial
-            } else if (eat('*')) {
+            if (eat('*')) {
                 x *= parseFactor(); // multiplication
             } else if (eat('/')) {
                 x /= parseFactor(); // division
@@ -107,6 +105,10 @@ public class Parser {
 
         if (eat('^')) {
             x = Math.pow(x, parseFactor()); // exponentiation
+        }
+
+        if (eat('!')) {
+            x = Fac.factorial(Math.round(x)); // factorial
         }
 
         return x;
