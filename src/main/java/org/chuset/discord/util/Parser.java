@@ -34,12 +34,6 @@ public class Parser {
         return x;
     }
 
-    // Grammar:
-    // expression = term | expression `+` term | expression `-` term
-    // term = factor | term `*` factor | term `/` factor
-    // factor = `+` factor | `-` factor | `(` expression `)`
-    //        | number | functionName factor | factor `^` factor
-
     private double parseExpression() {
         double x = parseTerm();
         while (true) {
