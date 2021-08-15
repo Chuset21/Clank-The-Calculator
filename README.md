@@ -33,7 +33,7 @@ __Extra Information__:
 - For Factorial operator and Fibonacci function if given a non-integer number the value will be rounded to the closest
   integer value, i.e: 2.4 -> 2, 2.5 -> 3.
 - Whitespace is optional.
-- Brackets respect the rules of orders of operation
+- Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
 - While brackets are not needed for functions, if not used the bot will only calculate the first value after the
   function name, i.e: fib3 + 3 -> 5, but fib(3 + 3) -> 8.
 
