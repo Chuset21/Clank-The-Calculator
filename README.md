@@ -4,12 +4,9 @@ A calculator bot for Discord that can take in arithmetic expressions and evaluat
 
 ## How to Use
 
-Make sure to prefix your message with "__$$__" for Clank to attempt to evaluate the expression.
+Just mention Clank anywhere in your message for Clank to attempt to evaluate the expression.
 
 ### Supported Operators and functions
-
-I am going to include examples for all the operators and functions, however I will skip the "$$" prefix here for
-clarity.
 
 - Unary '__+__': +5.1
 - Unary '__-__': -5.1  
