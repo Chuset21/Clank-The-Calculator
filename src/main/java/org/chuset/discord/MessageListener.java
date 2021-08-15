@@ -1,5 +1,6 @@
 package org.chuset.discord;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,14 +21,19 @@ public class MessageListener extends ListenerAdapter {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final MessageChannel channel = event.getChannel();
             try {
-                final String message = event.getMessage().getContentRaw();
-                if (message.startsWith("$$")) {
-                    channel.sendMessage(handler.handleMessage(message.replace("$$", "").trim())).queue();
+                final Message message = event.getMessage();
+                if (message.isMentioned(selfUser)) {
+                    channel.sendMessage(handler.handleMessage(
+                            message.getContentRaw().replaceAll("<@.*>", "").trim())).queue();
                 }
             } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
                 e.printStackTrace();
             } catch (Exception ignored) {
-                channel.sendMessage("There was an error handling the message.").queue();
+                try {
+                    channel.sendMessage("There was an error handling the message.").queue();
+                } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
