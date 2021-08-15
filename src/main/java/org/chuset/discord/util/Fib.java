@@ -18,7 +18,7 @@ public class Fib {
         } else if (n == 1) {
             return val;
         }
-        CACHE.putIfAbsent(n, fibonacciHelper(n - 1, val + prev, val));
+        CACHE.put(n, fibonacciHelper(n - 1, val + prev, val));
         return CACHE.get(n);
     }
 }
