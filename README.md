@@ -4,7 +4,7 @@ A calculator bot for Discord that can take in arithmetic expressions and evaluat
 
 ## How to Use
 
-Just mention Clank anywhere in your message for Clank to attempt to evaluate the expression.
+Just mention Clank anywhere in your message for him to attempt to evaluate the expression.
 
 ### Supported Operators and functions
 
