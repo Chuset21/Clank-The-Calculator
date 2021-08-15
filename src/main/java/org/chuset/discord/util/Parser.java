@@ -15,7 +15,7 @@ public class Parser {
     }
 
     private boolean eat(final char charToEat) {
-        while (ch == ' ') {
+        while (Character.isWhitespace(ch)) {
             nextChar();
         }
         if (ch == charToEat) {
