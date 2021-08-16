@@ -20,19 +20,19 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReceived(final MessageReceivedEvent event) {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final MessageChannel channel = event.getChannel();
+            final Message message = event.getMessage();
             try {
-                final Message message = event.getMessage();
                 if (message.isMentioned(selfUser)) {
                     channel.sendMessage(handler.handleMessage(
                             message.getContentRaw().replaceAll("<@.*>", "").trim())).queue();
                 }
             } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
                 e.printStackTrace();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
                 try {
-                    channel.sendMessage("There was an error handling the message.").queue();
-                } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
-                    e.printStackTrace();
+                    message.reply("There was an error handling the message:\n%s".formatted(e.getMessage())).queue();
+                } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e1) {
+                    e1.printStackTrace();
                 }
             }
         }
