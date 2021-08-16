@@ -1,11 +1,20 @@
 package org.chuset.discord.util;
 
+import java.util.Locale;
+
 public class Parser {
     private final String str;
     private int pos;
     private int ch;
 
     public Parser(final String str) {
+        if (str.isBlank()) {
+            throw new RuntimeException("Empty string given.");
+        }
+        if (str.chars().noneMatch(Character::isDigit)) {
+            throw new RuntimeException("Invalid expression given: No digits.");
+        }
+
         this.str = str;
         pos = -1;
     }
@@ -29,7 +38,7 @@ public class Parser {
         nextChar();
         final double x = parseExpression();
         if (pos < str.length()) {
-            throw new RuntimeException("Unexpected: " + (char) ch);
+            throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
         }
         return x;
     }
@@ -73,7 +82,9 @@ public class Parser {
         final int startPos = pos;
         if (eat('(')) { // parentheses
             x = parseExpression();
-            eat(')');
+            if (!eat(')')) {
+                throw new RuntimeException("Missing closing bracket \")\".");
+            }
         } else if (Character.isDigit(ch) || ch == '.') { // numbers
             while (Character.isDigit(ch) || ch == '.') {
                 nextChar();
@@ -85,16 +96,16 @@ public class Parser {
             }
             final String func = str.substring(startPos, pos);
             x = parseFactor();
-            x = switch (func) {
+            x = switch (func.toLowerCase(Locale.ROOT)) {
                 case "sqrt" -> Math.sqrt(x);
                 case "sin" -> Math.sin(Math.toRadians(x));
                 case "cos" -> Math.cos(Math.toRadians(x));
                 case "tan" -> Math.tan(Math.toRadians(x));
                 case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
-                default -> throw new RuntimeException("Unknown function: " + func);
+                default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(func));
             };
         } else {
-            throw new RuntimeException("Unexpected: " + (char) ch);
+            throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
         }
 
         if (eat('!')) {

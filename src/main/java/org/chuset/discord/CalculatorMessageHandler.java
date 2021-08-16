@@ -2,12 +2,10 @@ package org.chuset.discord;
 
 import org.chuset.discord.util.Parser;
 
-import java.util.Locale;
-
 public class CalculatorMessageHandler implements MessageTextHandler {
     @Override
     public String handleMessage(final String message) {
-        return doubleFormatterToString(evaluateExpression(message.toLowerCase(Locale.ROOT)));
+        return doubleFormatterToString(evaluateExpression(message));
     }
 
     public static String doubleFormatterToString(final double number) {
