@@ -19,11 +19,10 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(final MessageReceivedEvent event) {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
-            final MessageChannel channel = event.getChannel();
             final Message message = event.getMessage();
             try {
                 if (message.isMentioned(selfUser)) {
-                    channel.sendMessage(handler.handleMessage(
+                    message.reply(handler.handleMessage(
                             message.getContentRaw().replaceAll("<@.*>", "").trim())).queue();
                 }
             } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
