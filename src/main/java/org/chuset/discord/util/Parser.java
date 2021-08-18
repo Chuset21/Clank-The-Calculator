@@ -3,6 +3,9 @@ package org.chuset.discord.util;
 import java.util.Locale;
 
 public class Parser {
+    private static final RuntimeException OPENING_BRACKET = new RuntimeException("Missing opening bracket \")\".");
+    private static final RuntimeException CLOSING_BRACKET = new RuntimeException("Missing closing bracket \"(\".");
+
     private final String str;
     private int pos;
     private int ch;
@@ -144,7 +147,7 @@ public class Parser {
     }
 
     private RuntimeException missingBracket(final boolean closing) {
-        return new RuntimeException("Missing %s bracket \")\".".formatted(closing ? "closing" : "opening"));
+        return closing ? CLOSING_BRACKET : OPENING_BRACKET;
     }
 
     private RuntimeException unexpectedCharException() {
