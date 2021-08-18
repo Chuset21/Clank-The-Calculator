@@ -29,7 +29,8 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
 - Arc sine '__arcsin__': arcsin(0.8)
 - Arc cosine '__arccos__': arccos(0.8)
 - Arc tangent '__arctan__': arctan(0.8)
-- Log base e '__log__': log(5.1)
+- Log of any base '__log__': log(8, 2)
+- Natural log '__ln__': ln(5.1)
 - Fibonacci sequence '__fib__': fib(3)  
   <br>
 
@@ -44,8 +45,7 @@ __Extra Information__:
 - Whitespace is optional.
 - Case is ignored.
 - Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
-- While brackets are not needed for functions, if not used the bot will only calculate the first value after the
-  function name, i.e: fib3 + 3 -> 5, but fib(3 + 3) -> 8.
+- For the log of any base (log), pass the base as the second argument.
 
 ## Dependencies
 
