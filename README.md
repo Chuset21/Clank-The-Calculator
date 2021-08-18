@@ -29,6 +29,7 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
 - Arc sine '__arcsin__': arcsin(0.8)
 - Arc cosine '__arccos__': arccos(0.8)
 - Arc tangent '__arctan__': arctan(0.8)
+- Log base e '__log__': log(5.1)
 - Fibonacci sequence '__fib__': fib(3)  
   <br>
 
