@@ -96,6 +96,10 @@ public class Parser {
                 case "pi" -> x = Math.PI;
                 case "e" -> x = Math.E;
                 default -> { // functions
+                    if (!eat('(')) {
+                        throw new RuntimeException("Missing opening bracket \"(\".");
+                    }
+
                     x = parseFactor();
                     x = switch (funcOrConst) {
                         case "sqrt" -> Math.sqrt(x);
@@ -115,6 +119,10 @@ public class Parser {
                         case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
                         default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(funcOrConst));
                     };
+
+                    if (!eat(')')) {
+                        throw new RuntimeException("Missing closing bracket \")\".");
+                    }
                 }
             }
         } else {
