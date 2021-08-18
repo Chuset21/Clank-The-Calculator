@@ -111,7 +111,7 @@ public class Parser {
                             }
                             yield Log.log(x, parseFactor());
                         }
-                        case "loge" -> Math.log(x);
+                        case "ln" -> Math.log(x);
                         case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
                         default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(funcOrConst));
                     };
