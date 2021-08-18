@@ -11,9 +11,6 @@ public class Parser {
         if (str.isBlank()) {
             throw new RuntimeException("Empty string given.");
         }
-        if (str.chars().noneMatch(Character::isDigit)) {
-            throw new RuntimeException("Invalid expression given: No digits.");
-        }
 
         this.str = str;
         pos = -1;
@@ -90,23 +87,29 @@ public class Parser {
                 nextChar();
             }
             x = Double.parseDouble(str.substring(startPos, pos));
-        } else if (Character.isLetter(ch)) { // functions
+        } else if (Character.isLetter(ch)) {
             while (Character.isLetter(ch)) {
                 nextChar();
             }
-            final String func = str.substring(startPos, pos).toLowerCase(Locale.ROOT);
-            x = parseFactor();
-            x = switch (func) {
-                case "sqrt" -> Math.sqrt(x);
-                case "sin" -> Math.sin(Math.toRadians(x));
-                case "cos" -> Math.cos(Math.toRadians(x));
-                case "tan" -> Math.tan(Math.toRadians(x));
-                case "arcsin" -> Math.toDegrees(Math.asin(x));
-                case "arccos" -> Math.toDegrees(Math.acos(x));
-                case "arctan" -> Math.toDegrees(Math.atan(x));
-                case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
-                default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(func));
-            };
+            final String funcOrConst = str.substring(startPos, pos).toLowerCase(Locale.ROOT);
+            switch (funcOrConst) { // constants
+                case "pi" -> x = Math.PI;
+                case "e" -> x = Math.E;
+                default -> { // functions
+                    x = parseFactor();
+                    x = switch (funcOrConst) {
+                        case "sqrt" -> Math.sqrt(x);
+                        case "sin" -> Math.sin(Math.toRadians(x));
+                        case "cos" -> Math.cos(Math.toRadians(x));
+                        case "tan" -> Math.tan(Math.toRadians(x));
+                        case "arcsin" -> Math.toDegrees(Math.asin(x));
+                        case "arccos" -> Math.toDegrees(Math.acos(x));
+                        case "arctan" -> Math.toDegrees(Math.atan(x));
+                        case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
+                        default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(funcOrConst));
+                    };
+                }
+            }
         } else {
             throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
         }
