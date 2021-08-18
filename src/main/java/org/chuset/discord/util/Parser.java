@@ -147,11 +147,11 @@ public class Parser {
                         };
 
                         if (!eat(')')) {
-                            if (Character.isLetter(ch)) {
-                                throw unexpectedCharException();
+                            if (ch < 0) {
+                                throw new RuntimeException(
+                                        "Missing closing bracket \")\" for function \"%s\".".formatted(funcOrConst));
                             }
-                            throw new RuntimeException(
-                                    "Missing closing bracket \")\" for function \"%s\".".formatted(funcOrConst));
+                            throw unexpectedCharException();
                         }
                     }
                 }
