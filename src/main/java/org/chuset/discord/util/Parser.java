@@ -100,7 +100,7 @@ public class Parser {
                         throw new RuntimeException("Missing opening bracket \"(\".");
                     }
 
-                    x = parseFactor();
+                    x = parseExpression();
                     x = switch (funcOrConst) {
                         case "sqrt" -> Math.sqrt(x);
                         case "sin" -> Math.sin(Math.toRadians(x));
@@ -111,9 +111,9 @@ public class Parser {
                         case "arctan" -> Math.toDegrees(Math.atan(x));
                         case "log" -> {
                             if (!eat(',')) {
-                                throw new RuntimeException("Missing \",\" in \"log\" function");
+                                yield Math.log10(x);
                             }
-                            yield Log.log(x, parseFactor());
+                            yield Log.log(x, parseExpression());
                         }
                         case "ln" -> Math.log(x);
                         case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
@@ -121,6 +121,9 @@ public class Parser {
                     };
 
                     if (!eat(')')) {
+                        if (Character.isLetter(ch)) {
+                            throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
+                        }
                         throw new RuntimeException("Missing closing bracket \")\".");
                     }
                 }
