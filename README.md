@@ -45,6 +45,7 @@ __Extra Information__:
 - Whitespace is optional.
 - Case is ignored.
 - Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
+- All trigonometric functions deal with degrees.
 - For the log of any base (log), pass the base as the second argument.
 
 ## Dependencies
