@@ -29,6 +29,7 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
 - Arc sine '__arcsin__': arcsin(0.8)
 - Arc cosine '__arccos__': arccos(0.8)
 - Arc tangent '__arctan__': arctan(0.8)
+- Log base 10 '__log__': log(100)
 - Log of any base '__log__': log(8, 2)
 - Natural log '__ln__': ln(5.1)
 - Fibonacci sequence '__fib__': fib(3)  
@@ -46,7 +47,7 @@ __Extra Information__:
 - Case is ignored.
 - Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
 - All trigonometric functions deal with degrees.
-- For the log of any base (log), pass the base as the second argument.
+- For the log of any base (log), pass the base as the second argument. If given only one argument, log will default to using base 10.
 
 ## Dependencies
 
