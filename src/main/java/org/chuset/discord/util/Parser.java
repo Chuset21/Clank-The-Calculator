@@ -111,7 +111,7 @@ public class Parser {
                         case "arctan" -> Math.toDegrees(Math.atan(x));
                         case "log" -> {
                             if (!eat(',')) {
-                                throw new RuntimeException("Missing \",\" in \"logs\" function");
+                                throw new RuntimeException("Missing \",\" in \"log\" function");
                             }
                             yield Log.log(x, parseFactor());
                         }
