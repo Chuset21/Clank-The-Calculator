@@ -6,7 +6,7 @@ A calculator bot for Discord that can take in arithmetic expressions and evaluat
 
 Just mention Clank anywhere in your message for him to attempt to evaluate the expression.
 
-### Supported Operators, functions and constants
+## Supported Operators, functions and constants
 
 - Unary '__+__': +5.1
 - Unary '__-__': -5.1  
@@ -48,6 +48,19 @@ __Extra Information__:
 - Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
 - All trigonometric functions deal with degrees.
 - For the log of any base (log), pass the base as the second argument. If given only one argument, log will default to using base 10.
+
+## User Defined Constants
+How to declare your own constant:  
+Give it the constant name that you would like to set (must only contain letters) and then give it an expression after the '='.  
+- const = e * 2 / ln(e)  
+
+How to use your declared constant:
+- const * 5.1
+
+__Extra Information__:
+
+- The names of the declared constants are case-sensitive, 'x' != 'X'.
+- It can only store up to __100__ user defined constants. If the user tries to add another constant after this point, it will delete the oldest declared constant and add the new constant.
 
 ## Dependencies
 
