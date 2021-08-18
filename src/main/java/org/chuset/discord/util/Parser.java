@@ -39,6 +39,23 @@ public class Parser {
 
     public double parse() {
         nextChar();
+        if (str.matches("^[a-zA-Z]+\\s*=\\s*.+$")) {
+            final int startingPos = pos;
+            while (Character.isLetter(ch)) {
+                nextChar();
+            }
+            final String constantName = str.substring(startingPos, pos);
+            eat('=');
+
+            if (USER_DEFINED_CONSTANTS.containsKey(constantName)) {
+                USER_DEFINED_CONSTANTS.put(constantName, parseExpression());
+                throw new CancellationException("Overwrote last value of \"%s\".".formatted(constantName));
+            } else {
+                USER_DEFINED_CONSTANTS.put(constantName, parseExpression());
+                throw new CancellationException("Successfully declared constant \"%s\".".formatted(constantName));
+            }
+        }
+
         final double x = parseExpression();
         if (pos < str.length()) {
             throw unexpectedCharException();
@@ -103,21 +120,10 @@ public class Parser {
                 case "pi" -> x = Math.PI;
                 case "e" -> x = Math.E;
                 default -> {
-                    if (eat('=')) {
-                        if (USER_DEFINED_CONSTANTS.containsKey(funcOrConst)) {
-                            USER_DEFINED_CONSTANTS.put(funcOrConst, parseExpression());
-                            throw new CancellationException(
-                                    "Overwrote last value of \"%s\".".formatted(funcOrConst));
-                        } else {
-                            USER_DEFINED_CONSTANTS.put(funcOrConst, parseExpression());
-                            throw new CancellationException(
-                                    "Successfully declared constant \"%s\".".formatted(funcOrConst));
-                        }
-                    } else if (USER_DEFINED_CONSTANTS.containsKey(funcOrConst)) {
+                    if (USER_DEFINED_CONSTANTS.containsKey(funcOrConst)) {
                         x = USER_DEFINED_CONSTANTS.get(funcOrConst);
                     } else if (!eat('(')) { // functions
-                        throw new RuntimeException(
-                                "\"%s\" is undefined.".formatted(funcOrConst));
+                        throw new RuntimeException("\"%s\" is undefined.".formatted(funcOrConst));
                     } else {
 
                         x = parseExpression();
