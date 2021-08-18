@@ -94,13 +94,16 @@ public class Parser {
             while (Character.isLetter(ch)) {
                 nextChar();
             }
-            final String func = str.substring(startPos, pos);
+            final String func = str.substring(startPos, pos).toLowerCase(Locale.ROOT);
             x = parseFactor();
-            x = switch (func.toLowerCase(Locale.ROOT)) {
+            x = switch (func) {
                 case "sqrt" -> Math.sqrt(x);
                 case "sin" -> Math.sin(Math.toRadians(x));
                 case "cos" -> Math.cos(Math.toRadians(x));
                 case "tan" -> Math.tan(Math.toRadians(x));
+                case "arcsin" -> Math.toDegrees(Math.asin(x));
+                case "arccos" -> Math.toDegrees(Math.acos(x));
+                case "arctan" -> Math.toDegrees(Math.atan(x));
                 case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
                 default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(func));
             };
