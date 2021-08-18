@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.concurrent.CancellationException;
+
 public class MessageListener extends ListenerAdapter {
 
     private final User selfUser;
@@ -26,6 +28,12 @@ public class MessageListener extends ListenerAdapter {
                 }
             } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
                 e.printStackTrace();
+            } catch (CancellationException e) {
+                try {
+                    message.reply(e.getMessage()).queue();
+                } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e1) {
+                    e1.printStackTrace();
+                }
             } catch (Exception e) {
                 try {
                     message.reply("There was an error handling the message:\n%s".formatted(e.getMessage())).queue();

@@ -1,10 +1,13 @@
 package org.chuset.discord.util;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CancellationException;
 
 public class Parser {
-    private static final RuntimeException OPENING_BRACKET = new RuntimeException("Missing opening bracket \")\".");
-    private static final RuntimeException CLOSING_BRACKET = new RuntimeException("Missing closing bracket \"(\".");
+    private static final Map<String, Double> USER_DEFINED_CONSTANTS = new MaxSizeHashMap<>(100);
+
+    private static final RuntimeException CLOSING_BRACKET = new RuntimeException("Missing closing bracket \")\".");
 
     private final String str;
     private int pos;
@@ -83,7 +86,7 @@ public class Parser {
         if (eat('(')) { // parentheses
             x = parseExpression();
             if (!eat(')')) {
-                throw missingBracket(true);
+                throw CLOSING_BRACKET;
             }
         } else if (Character.isDigit(ch) || ch == '.') { // numbers
             while (Character.isDigit(ch) || ch == '.') {
@@ -94,40 +97,56 @@ public class Parser {
             while (Character.isLetter(ch)) {
                 nextChar();
             }
-            final String funcOrConst = str.substring(startPos, pos).toLowerCase(Locale.ROOT);
-            switch (funcOrConst) { // constants
+            final String funcOrConst = str.substring(startPos, pos);
+            final String funcOrConstLowerCase = funcOrConst.toLowerCase(Locale.ROOT);
+            switch (funcOrConstLowerCase) { // constants
                 case "pi" -> x = Math.PI;
                 case "e" -> x = Math.E;
-                default -> { // functions
-                    if (!eat('(')) {
-                        throw missingBracket(false);
-                    }
+                default -> {
+                    if (eat('=')) {
+                        if (USER_DEFINED_CONSTANTS.containsKey(funcOrConst)) {
+                            USER_DEFINED_CONSTANTS.put(funcOrConst, parseExpression());
+                            throw new CancellationException(
+                                    "Overwrote last value of \"%s\".".formatted(funcOrConst));
+                        } else {
+                            USER_DEFINED_CONSTANTS.put(funcOrConst, parseExpression());
+                            throw new CancellationException(
+                                    "Successfully declared constant \"%s\".".formatted(funcOrConst));
+                        }
+                    } else if (USER_DEFINED_CONSTANTS.containsKey(funcOrConst)) {
+                        x = USER_DEFINED_CONSTANTS.get(funcOrConst);
+                    } else if (!eat('(')) { // functions
+                        throw new RuntimeException(
+                                "\"%s\" is undefined.".formatted(funcOrConst));
+                    } else {
 
-                    x = parseExpression();
-                    x = switch (funcOrConst) {
-                        case "sqrt" -> Math.sqrt(x);
-                        case "sin" -> Math.sin(Math.toRadians(x));
-                        case "cos" -> Math.cos(Math.toRadians(x));
-                        case "tan" -> Math.tan(Math.toRadians(x));
-                        case "arcsin" -> Math.toDegrees(Math.asin(x));
-                        case "arccos" -> Math.toDegrees(Math.acos(x));
-                        case "arctan" -> Math.toDegrees(Math.atan(x));
-                        case "log" -> {
-                            if (!eat(',')) {
-                                yield Math.log10(x);
+                        x = parseExpression();
+                        x = switch (funcOrConstLowerCase) {
+                            case "sqrt" -> Math.sqrt(x);
+                            case "sin" -> Math.sin(Math.toRadians(x));
+                            case "cos" -> Math.cos(Math.toRadians(x));
+                            case "tan" -> Math.tan(Math.toRadians(x));
+                            case "arcsin" -> Math.toDegrees(Math.asin(x));
+                            case "arccos" -> Math.toDegrees(Math.acos(x));
+                            case "arctan" -> Math.toDegrees(Math.atan(x));
+                            case "log" -> {
+                                if (!eat(',')) {
+                                    yield Math.log10(x);
+                                }
+                                yield Log.log(x, parseExpression());
                             }
-                            yield Log.log(x, parseExpression());
-                        }
-                        case "ln" -> Math.log(x);
-                        case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
-                        default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(funcOrConst));
-                    };
+                            case "ln" -> Math.log(x);
+                            case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
+                            default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(funcOrConst));
+                        };
 
-                    if (!eat(')')) {
-                        if (Character.isLetter(ch)) {
-                            throw unexpectedCharException();
+                        if (!eat(')')) {
+                            if (Character.isLetter(ch)) {
+                                throw unexpectedCharException();
+                            }
+                            throw new RuntimeException(
+                                    "Missing closing bracket \")\" for function \"%s\".".formatted(funcOrConst));
                         }
-                        throw missingBracket(true);
                     }
                 }
             }
@@ -144,10 +163,6 @@ public class Parser {
         }
 
         return x;
-    }
-
-    private RuntimeException missingBracket(final boolean closing) {
-        return closing ? CLOSING_BRACKET : OPENING_BRACKET;
     }
 
     private RuntimeException unexpectedCharException() {
