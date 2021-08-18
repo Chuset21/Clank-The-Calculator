@@ -35,7 +35,7 @@ public class Parser {
         nextChar();
         final double x = parseExpression();
         if (pos < str.length()) {
-            throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
+            throw unexpectedCharException();
         }
         return x;
     }
@@ -80,7 +80,7 @@ public class Parser {
         if (eat('(')) { // parentheses
             x = parseExpression();
             if (!eat(')')) {
-                throw new RuntimeException("Missing closing bracket \")\".");
+                throw missingBracket(true);
             }
         } else if (Character.isDigit(ch) || ch == '.') { // numbers
             while (Character.isDigit(ch) || ch == '.') {
@@ -97,7 +97,7 @@ public class Parser {
                 case "e" -> x = Math.E;
                 default -> { // functions
                     if (!eat('(')) {
-                        throw new RuntimeException("Missing opening bracket \"(\".");
+                        throw missingBracket(false);
                     }
 
                     x = parseExpression();
@@ -122,14 +122,14 @@ public class Parser {
 
                     if (!eat(')')) {
                         if (Character.isLetter(ch)) {
-                            throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
+                            throw unexpectedCharException();
                         }
-                        throw new RuntimeException("Missing closing bracket \")\".");
+                        throw missingBracket(true);
                     }
                 }
             }
         } else {
-            throw new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
+            throw unexpectedCharException();
         }
 
         if (eat('!')) {
@@ -141,5 +141,13 @@ public class Parser {
         }
 
         return x;
+    }
+
+    private RuntimeException missingBracket(final boolean closing) {
+        return new RuntimeException("Missing %s bracket \")\".".formatted(closing ? "closing" : "opening"));
+    }
+
+    private RuntimeException unexpectedCharException() {
+        return new RuntimeException("Unexpected: \"%s\".".formatted(ch != -1 ? (char) ch : str));
     }
 }
