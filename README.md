@@ -6,7 +6,7 @@ A calculator bot for Discord that can take in arithmetic expressions and evaluat
 
 Just mention Clank anywhere in your message for him to attempt to evaluate the expression.
 
-### Supported Operators and functions
+### Supported Operators, functions and constants
 
 - Unary '__+__': +5.1
 - Unary '__-__': -5.1  
@@ -26,13 +26,22 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
 - Sine '__sin__': sin(5.1)
 - Cosine '__cos__': cos(5.1)
 - Tangent '__tan__': tan(5.1)
-- Fibonacci sequence '__fib__': fib(3)
+- Arc sine '__arcsin__': arcsin(0.8)
+- Arc cosine '__arccos__': arccos(0.8)
+- Arc tangent '__arctan__': arctan(0.8)
+- Fibonacci sequence '__fib__': fib(3)  
+  <br>
+
+Supported constants:
+- PI
+- e
 
 __Extra Information__:
 
 - For Factorial operator and Fibonacci function if given a non-integer number the value will be rounded to the closest
   integer value, i.e: 2.4 -> 2, 2.5 -> 3.
 - Whitespace is optional.
+- Case is ignored.
 - Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
 - While brackets are not needed for functions, if not used the bot will only calculate the first value after the
   function name, i.e: fib3 + 3 -> 5, but fib(3 + 3) -> 8.
