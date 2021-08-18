@@ -105,6 +105,7 @@ public class Parser {
                         case "arcsin" -> Math.toDegrees(Math.asin(x));
                         case "arccos" -> Math.toDegrees(Math.acos(x));
                         case "arctan" -> Math.toDegrees(Math.atan(x));
+                        case "log" -> Math.log(x);
                         case "fib" -> Fib.fibonacci(Math.round(x)); // fibonacci
                         default -> throw new RuntimeException("Unknown function: \"%s\".".formatted(funcOrConst));
                     };
