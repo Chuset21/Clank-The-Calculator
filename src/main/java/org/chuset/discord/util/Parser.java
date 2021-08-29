@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 public class Parser {
-    private static final Map<String, Double> USER_DEFINED_CONSTANTS = new MaxSizeHashMap<>(100);
+    private static final int MAX_SIZE_MAP = 100;
+    private static final Map<String, Double> USER_DEFINED_CONSTANTS = new MaxSizeHashMap<>(MAX_SIZE_MAP);
 
     private static final RuntimeException CLOSING_BRACKET = new RuntimeException("Missing closing bracket \")\".");
 
