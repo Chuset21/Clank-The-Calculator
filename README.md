@@ -26,7 +26,8 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
 - Ceiling value '__ceil__': ceil(5.1)
 - Floor value '__floor__': floor(5.1)
 - Absolute value '__abs__': abs(-5.1)
-- Square root '__sqrt__': sqrt(5.1)
+- Square root '__sqrt__': sqrt(5.1) __or__ root(5.1)
+- N-th root '__root__': root(5.1, 3)
 - Sine '__sin__': sin(5.1)
 - Cosine '__cos__': cos(5.1)
 - Tangent '__tan__': tan(5.1)
@@ -40,31 +41,38 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
   <br>
 
 Supported constants:
+
 - PI
 - e
 
 __Extra Information__:
 
-- For Factorial operator and Fibonacci function if given a non-integer number the value will be rounded to the closest
-  integer value, i.e: 2.4 -> 2, 2.5 -> 3.
+- For Factorial operator, Fibonacci function and N-th root function if given a non-integer number the value will be
+  rounded to the closest integer value, i.e: 2.4 -> 2, 2.5 -> 3.
 - Whitespace is optional.
 - Case is ignored.
 - Brackets respect the rules of orders of operation, as does everything else, i.e: 2 * (2 + 3) -> 10.
 - All trigonometric functions deal with degrees.
-- For the log of any base (log), pass the base as the second argument. If given only one argument, log will default to using base 10.
+- For the log of any base (log), pass the base as the second argument. If given only one argument, log will default to
+  using base 10.
 
 ## User Defined Constants
+
 How to declare your own constant:  
-Give it the constant name that you would like to set (must only contain letters) and then give it an expression after the '='.  
-- const = e * 2 / ln(e)  
+Give it the constant name that you would like to set (must only contain letters) and then give it an expression after
+the '='.
+
+- const = e * 2 / ln(e)
 
 How to use your declared constant:
+
 - const * 5.1
 
 __Extra Information__:
 
 - The names of the declared constants are case-sensitive, 'x' != 'X'.
-- It can only store up to __100__ user defined constants. If the user tries to add another constant after this point, it will delete the oldest declared constant and add the new constant.
+- It can only store up to __100__ user defined constants. If the user tries to add another constant after this point, it
+  will delete the oldest declared constant and add the new constant.
 
 ## Dependencies
 
