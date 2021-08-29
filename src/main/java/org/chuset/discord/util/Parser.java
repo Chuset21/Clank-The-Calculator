@@ -49,12 +49,12 @@ public class Parser {
 
             if (USER_DEFINED_CONSTANTS.containsKey(constantName)) {
                 USER_DEFINED_CONSTANTS.put(constantName, parseExpression());
-                throw new CancellationException("Overwrote last value of \"%s\" with value: %s.".
+                throw new CancellationException("Overwrote last value of \"**%s**\" with value: **%s**.".
                         formatted(constantName,
                                 Format.doubleFormatterToString(USER_DEFINED_CONSTANTS.get(constantName))));
             } else {
                 USER_DEFINED_CONSTANTS.put(constantName, parseExpression());
-                throw new CancellationException("Successfully declared constant \"%s\" with value: %s.".
+                throw new CancellationException("Successfully declared constant \"**%s**\" with value: **%s**.".
                         formatted(constantName,
                                 Format.doubleFormatterToString(USER_DEFINED_CONSTANTS.get(constantName))));
             }
