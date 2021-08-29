@@ -142,7 +142,7 @@ public class Parser {
                                     yield Math.sqrt(x);
                                 }
 
-                                final double y = Math.round(parseExpression());
+                                final long y = Math.round(parseExpression());
                                 if (y == 2) {
                                     yield Math.sqrt(x);
                                 } else if (y == 3) {
