@@ -22,6 +22,10 @@ Just mention Clank anywhere in your message for him to attempt to evaluate the e
 - Factorial '__!__': 3!  
   <br>
 
+- Rounded value '__round__': round(5.1)
+- Ceiling value '__ceil__': ceil(5.1)
+- Floor value '__floor__': floor(5.1)
+- Absolute value '__abs__': abs(-5.1)
 - Square root '__sqrt__': sqrt(5.1)
 - Sine '__sin__': sin(5.1)
 - Cosine '__cos__': cos(5.1)
