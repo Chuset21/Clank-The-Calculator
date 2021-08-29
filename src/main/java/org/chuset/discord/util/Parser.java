@@ -141,10 +141,14 @@ public class Parser {
                                 if (!eat(',')) {
                                     yield Math.sqrt(x);
                                 }
+
                                 final double y = Math.round(parseExpression());
-                                if (y == 3) {
+                                if (y == 2) {
+                                    yield Math.sqrt(x);
+                                } else if (y == 3) {
                                     yield Math.cbrt(x);
                                 }
+
                                 yield Math.round(Math.pow(x, 1.0 / y));
                             }
                             case "sin" -> Math.sin(Math.toRadians(x));
