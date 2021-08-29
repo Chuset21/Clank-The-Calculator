@@ -132,6 +132,7 @@ public class Parser {
 
                         x = parseExpression();
                         x = switch (funcOrConstLowerCase) {
+                            case "round" -> Math.round(x);
                             case "ceil" -> Math.ceil(x);
                             case "floor" -> Math.floor(x);
                             case "abs" -> Math.abs(x);
