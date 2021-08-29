@@ -137,6 +137,12 @@ public class Parser {
                             case "floor" -> Math.floor(x);
                             case "abs" -> Math.abs(x);
                             case "sqrt" -> Math.sqrt(x);
+                            case "root" -> {
+                                if (!eat(',')) {
+                                    yield Math.sqrt(x);
+                                }
+                                yield Math.round(Math.pow(x, 1 / parseExpression()));
+                            }
                             case "sin" -> Math.sin(Math.toRadians(x));
                             case "cos" -> Math.cos(Math.toRadians(x));
                             case "tan" -> Math.tan(Math.toRadians(x));
