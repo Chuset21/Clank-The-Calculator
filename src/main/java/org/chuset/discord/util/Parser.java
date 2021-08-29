@@ -132,6 +132,7 @@ public class Parser {
 
                         x = parseExpression();
                         x = switch (funcOrConstLowerCase) {
+                            case "floor" -> Math.floor(x);
                             case "abs" -> Math.abs(x);
                             case "sqrt" -> Math.sqrt(x);
                             case "sin" -> Math.sin(Math.toRadians(x));
