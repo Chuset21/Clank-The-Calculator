@@ -11,11 +11,9 @@ import java.util.regex.Pattern;
 public class MessageListener extends ListenerAdapter {
 
     private final User selfUser;
-    private final MessageTextHandler handler;
 
-    public MessageListener(final User selfUser, final MessageTextHandler handler) {
+    public MessageListener(final User selfUser) {
         this.selfUser = selfUser;
-        this.handler = handler;
     }
 
     @Override
