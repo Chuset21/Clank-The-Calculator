@@ -29,14 +29,14 @@ public class MessageListener extends ListenerAdapter {
                     }
 
                     final TextChannel channel = event.getTextChannel();
-                    channel.sendMessage("Prepare yourself\nYou will enjoy this.").complete().delete().complete();
+                    channel.sendMessage("Prepare yourself\nYou will enjoy this.").complete().delete().queue();
 
                     final int limit = Math.max(Math.min(Integer.parseInt(m.group(2)), 100), 1);
                     final String text = m.group(1);
                     for (int i = 0; i < limit; i++) {
-                        channel.sendMessage(text).complete().delete().complete();
+                        channel.sendMessage(text).complete().delete().queue();
                     }
-                    channel.sendMessage("Trolling complete.").complete().delete().complete();
+                    channel.sendMessage("Trolling complete.").complete().delete().queue();
                 }
             } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
                 e.printStackTrace();
