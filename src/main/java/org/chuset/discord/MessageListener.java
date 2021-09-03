@@ -20,6 +20,8 @@ public class MessageListener extends ListenerAdapter {
         this.selfUser = selfUser;
     }
 
+    private static final RuntimeException MATCHER_ERROR =
+            new RuntimeException("Provide the text to be sent and the number of times for the it to be repeated.");
     private static final String DM = "-dm";
 
     @Override
@@ -38,7 +40,7 @@ public class MessageListener extends ListenerAdapter {
                         final Matcher m = Pattern.compile("^(.*)\\s+(\\d+)$").matcher(
                                 rawText.replace(DM, "").replaceAll("<@.\\d+>", "").trim());
                         if (!m.find() || m.groupCount() != 2) {
-                            throw new RuntimeException("No Matches");
+                            throw MATCHER_ERROR;
                         }
 
                         final int limit = Math.max(Math.min(Integer.parseInt(m.group(2)), 100), 1);
@@ -53,7 +55,7 @@ public class MessageListener extends ListenerAdapter {
                         final String rawMessage = rawText.replaceFirst("<@.\\d+>", "").trim();
                         final Matcher m = Pattern.compile("^(.*)\\s+(\\d+)$").matcher(rawMessage);
                         if (!m.find() || m.groupCount() != 2) {
-                            throw new RuntimeException("No Matches");
+                            throw MATCHER_ERROR;
                         }
 
                         final TextChannel channel = event.getTextChannel();
