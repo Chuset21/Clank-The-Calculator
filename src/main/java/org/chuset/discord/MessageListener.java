@@ -37,7 +37,7 @@ public class MessageListener extends ListenerAdapter {
                                 filter(u -> u.getIdLong() != selfUser.getIdLong()).
                                 collect(Collectors.toList());
 
-                        final Matcher m = Pattern.compile("^(.*)\\s+(\\d+)$").matcher(
+                        final Matcher m = Pattern.compile("^([\\s\\S]*)\\s+(\\d+)$").matcher(
                                 rawText.replace(DM, "").replaceAll("<@.\\d+>", "").trim());
                         if (!m.find() || m.groupCount() != 2) {
                             throw MATCHER_ERROR;
@@ -53,7 +53,7 @@ public class MessageListener extends ListenerAdapter {
                         }
                     } else {
                         final String rawMessage = rawText.replaceFirst("<@.\\d+>", "").trim();
-                        final Matcher m = Pattern.compile("^(.*)\\s+(\\d+)$").matcher(rawMessage);
+                        final Matcher m = Pattern.compile("^([\\s\\S]*)\\s+(\\d+)$").matcher(rawMessage);
                         if (!m.find() || m.groupCount() != 2) {
                             throw MATCHER_ERROR;
                         }
