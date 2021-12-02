@@ -21,7 +21,7 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static final RuntimeException MATCHER_ERROR =
-            new RuntimeException("Provide the text to be sent and the number of times for the it to be repeated.");
+            new RuntimeException("Provide the text to be sent and the number of times for it to be repeated.");
     private static final String DM = "-dm";
 
     @Override
