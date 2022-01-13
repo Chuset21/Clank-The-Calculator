@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -25,7 +26,11 @@ public class MessageListener extends ListenerAdapter {
     private static final String DM = "-dm";
 
     @Override
-    public void onMessageReceived(final MessageReceivedEvent event) {
+    public void onMessageReceived(final @NotNull MessageReceivedEvent event) {
+        new Thread(() -> harass(event)).start();
+    }
+
+    public void harass(final MessageReceivedEvent event) {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final Message message = event.getMessage();
             try {
