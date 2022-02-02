@@ -38,6 +38,9 @@ public class MessageListener extends ListenerAdapter {
         USER_REACTION_MAP.put(167321102438105088L, new ArrayList<>() {{
             add("\uD83C\uDF44");
         }}); // Pogloser
+        USER_REACTION_MAP.put(195633376701579264L, new ArrayList<>() {{
+            add("\uD83E\uDD5D");
+        }}); // Kiwi
     }
 
     public MessageListener(final User selfUser) {
