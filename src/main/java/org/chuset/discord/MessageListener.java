@@ -86,11 +86,27 @@ public class MessageListener extends ListenerAdapter {
             new Thread(() -> harass(event)).start();
         }
 
-        USER_REACTION_MAP.getOrDefault(event.getAuthor().getIdLong(), Collections.emptyList()). // Emoji List
-                forEach(emoji -> message.addReaction(emoji).complete());
+        try {
+            USER_REACTION_MAP.getOrDefault(event.getAuthor().getIdLong(), Collections.emptyList()). // Emoji List
+                    forEach(emoji -> message.addReaction(emoji).complete());
 
-        GUILD_EMOJI_MAP.getOrDefault(guildId, Collections.emptySet()).
-                forEach(emote -> message.addReaction(emote).complete());
+            GUILD_EMOJI_MAP.getOrDefault(guildId, Collections.emptySet()).
+                    forEach(emote -> message.addReaction(emote).complete());
+        } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e) {
+            e.printStackTrace();
+        } catch (CancellationException e) {
+            try {
+                message.reply(e.getMessage()).queue();
+            } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e1) {
+                e1.printStackTrace();
+            }
+        } catch (Exception e) {
+            try {
+                message.reply("There was an error handling the message:\n%s".formatted(e.getMessage())).queue();
+            } catch (net.dv8tion.jda.api.exceptions.InsufficientPermissionException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 
     public void harass(final MessageReceivedEvent event) {
