@@ -22,11 +22,11 @@ public class MessageListener extends ListenerAdapter {
     static {
         USER_REACTION_MAP = new HashMap<>();
 
-        USER_REACTION_MAP.put(243411239861092352L, List.of("<:pepe_clown:881911897237123133")); // Krozo
-        USER_REACTION_MAP.put(349654731305779231L, List.of("<:child_mortality:921550210260434994")); // Mickey
-        USER_REACTION_MAP.put(671008061938204685L, List.of("<:snailbob:938390896884461648")); // Angry Lady
-        USER_REACTION_MAP.put(661924517173657622L, List.of("\uD83D\uDCE2", "\uD83D\uDCA8")); // baZoo
-        USER_REACTION_MAP.put(167321102438105088L, List.of("\uD83C\uDF44")); // Pogloser
+        USER_REACTION_MAP.put(243411239861092352L, new ArrayList<>() {{ add("<:pepe_clown:881911897237123133");}}); // Krozo
+        USER_REACTION_MAP.put(349654731305779231L, new ArrayList<>() {{ add("<:child_mortality:921550210260434994");}}); // Mickey
+        USER_REACTION_MAP.put(671008061938204685L, new ArrayList<>() {{ add("<:snailbob:938390896884461648");}}); // Angry Lady
+        USER_REACTION_MAP.put(661924517173657622L, new ArrayList<>() {{ add("\uD83D\uDCE2"); add("\uD83D\uDCA8");}}); // baZoo
+        USER_REACTION_MAP.put(167321102438105088L, new ArrayList<>() {{ add("\uD83C\uDF44");}}); // Pogloser
     }
 
     public MessageListener(final User selfUser) {
