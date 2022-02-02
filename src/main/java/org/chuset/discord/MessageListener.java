@@ -64,12 +64,10 @@ public class MessageListener extends ListenerAdapter {
                         return v;
                     });
                 } else if (lowercase.matches("^!set .*\\s+off$")) {
-                    GUILD_EMOJI_MAP.computeIfPresent(guildId, (k, v) -> {
-                        v.remove(lowercase.
-                                replace(" off", "").
-                                replace(">", "").replace("!set ", ""));
-                        return v;
-                    });
+                    GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).
+                            remove(lowercase.
+                                    replace(" off", "").
+                                    replace(">", "").replace("!set ", ""));
                 }
 
                 GUILD_EMOJI_MAP.getOrDefault(guildId, Collections.emptySet()).
