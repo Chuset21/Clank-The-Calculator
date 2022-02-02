@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CancellationException;
@@ -17,11 +19,11 @@ import java.util.stream.Collectors;
 public class MessageListener extends ListenerAdapter {
 
     private final User selfUser;
-    private boolean smile;
+    private final Map<Long, Boolean> smileMap;
 
     public MessageListener(final User selfUser) {
         this.selfUser = selfUser;
-        smile = false;
+        smileMap = new HashMap<>();
     }
 
     private static final RuntimeException MATCHER_ERROR =
@@ -39,14 +41,15 @@ public class MessageListener extends ListenerAdapter {
             try {
                 final String rawText = message.getContentRaw();
 
+                final long guildId = event.getGuild().getIdLong();
                 final String lowercase = rawText.toLowerCase(Locale.ROOT);
                 if (lowercase.contains("smile on")) {
-                    smile = true;
+                    smileMap.put(guildId, true);
                 } else if (lowercase.contains("smile off")) {
-                    smile = false;
+                    smileMap.put(guildId, false);
                 }
 
-                if (smile) {
+                if (smileMap.getOrDefault(guildId, false)) {
                     message.addReaction("\uD83D\uDE42").complete();
                 }
 
