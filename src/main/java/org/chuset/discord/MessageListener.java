@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CancellationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,9 +17,11 @@ import java.util.stream.Collectors;
 public class MessageListener extends ListenerAdapter {
 
     private final User selfUser;
+    private boolean smile;
 
     public MessageListener(final User selfUser) {
         this.selfUser = selfUser;
+        smile = false;
     }
 
     private static final RuntimeException MATCHER_ERROR =
@@ -35,6 +38,18 @@ public class MessageListener extends ListenerAdapter {
             final Message message = event.getMessage();
             try {
                 final String rawText = message.getContentRaw();
+
+                final String lowercase = rawText.toLowerCase(Locale.ROOT);
+                if (lowercase.contains("smile on")) {
+                    smile = true;
+                } else if (lowercase.contains("smile off")) {
+                    smile = false;
+                }
+
+                if (smile) {
+                    message.addReaction("\uD83D\uDE42").complete();
+                }
+
                 if (message.isMentioned(selfUser)) {
                     if (rawText.contains(DM)) {
                         final List<User> mentionedUsers = message.getMentionedMembers().stream().
