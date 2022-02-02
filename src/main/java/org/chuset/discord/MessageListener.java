@@ -17,7 +17,7 @@ public class MessageListener extends ListenerAdapter {
 
     private final static Map<Long, List<String>> USER_REACTION_MAP;
     private final User selfUser;
-    private static final Map<Long, Set<String>> GUILD_EMOJI_MAP = new HashMap<>(); // Command -> '!set <emoji> (on|off)
+    private static final Map<Long, Set<String>> GUILD_EMOJI_MAP = new HashMap<>(); // Command -> '!set <emoji> (on|off) ?(users)
 
     static {
         USER_REACTION_MAP = new HashMap<>();
@@ -39,39 +39,65 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(final @NotNull MessageReceivedEvent event) {
-        new Thread(() -> harass(event)).start();
+        final Message message = event.getMessage();
+        final String rawText = message.getContentRaw();
+        final String lowercase = rawText.toLowerCase(Locale.ROOT);
+
+        final long guildId = event.getGuild().getIdLong();
+
+        if (lowercase.startsWith("!set")) {
+            final List<Long> mentionedUsers = message.getMentionedUsers().stream().
+                    map(User::getIdLong).
+                    collect(Collectors.toList());
+
+            final String emojiCommand = lowercase.replaceAll("<@.\\d+>", "").
+                    replace(">", "").replace("!set ", "");
+
+            if (lowercase.matches("^!set\\s+.*\\s+on.*")) {
+                final String emoji = emojiCommand.replace(" on", "").trim();
+
+                if (!mentionedUsers.isEmpty()) {
+                    mentionedUsers.forEach(id -> USER_REACTION_MAP.compute(id, (k, v) -> {
+                        if (v == null) {
+                            v = new ArrayList<>();
+                        }
+                        v.add(emoji);
+                        return v;
+                    }));
+                } else {
+                    GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
+                        if (v == null) {
+                            v = new HashSet<>();
+                        }
+                        v.add(emoji);
+                        return v;
+                    });
+                }
+            } else if (lowercase.matches("^!set .*\\s+off.*")) {
+                final String emoji = emojiCommand.replace("off", "").trim();
+
+                if (!mentionedUsers.isEmpty()) {
+                    mentionedUsers.forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
+                } else {
+                    GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).remove(emoji);
+                }
+            }
+        } else {
+            new Thread(() -> harass(event)).start();
+        }
+
+        USER_REACTION_MAP.getOrDefault(event.getAuthor().getIdLong(), Collections.emptyList()). // Emoji List
+                forEach(emoji -> message.addReaction(emoji).complete());
+
+        GUILD_EMOJI_MAP.getOrDefault(guildId, Collections.emptySet()).
+                forEach(emote -> message.addReaction(emote).complete());
     }
 
     public void harass(final MessageReceivedEvent event) {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final Message message = event.getMessage();
             try {
-                USER_REACTION_MAP.getOrDefault(event.getAuthor().getIdLong(), Collections.emptyList()). // Emoji List
-                        forEach(emoji -> message.addReaction(emoji).complete());
-
                 final String rawText = message.getContentRaw();
-
-                final long guildId = event.getGuild().getIdLong();
-                final String lowercase = rawText.toLowerCase(Locale.ROOT);
-
-                if (lowercase.matches("^!set .*\\s+on$")) {
-                    GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
-                        if (v == null) {
-                            v = new HashSet<>();
-                        }
-                        v.add(lowercase.replace(" on", "").
-                                replace(">", "").replace("!set ", ""));
-                        return v;
-                    });
-                } else if (lowercase.matches("^!set .*\\s+off$")) {
-                    GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).
-                            remove(lowercase.
-                                    replace(" off", "").
-                                    replace(">", "").replace("!set ", ""));
-                }
-
-                GUILD_EMOJI_MAP.getOrDefault(guildId, Collections.emptySet()).
-                        forEach(emote -> message.addReaction(emote).complete());
 
                 if (message.isMentioned(selfUser)) {
                     if (rawText.contains(DM)) {
