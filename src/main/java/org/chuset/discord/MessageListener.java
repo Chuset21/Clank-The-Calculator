@@ -7,10 +7,7 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,8 +15,18 @@ import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
 
+    private final static Map<Long, List<String>> userReactionMap;
     private final User selfUser;
     private final Map<Long, Boolean> smileMap;
+
+    static {
+        userReactionMap = new HashMap<>();
+
+        userReactionMap.put(243411239861092352L, List.of("<:pepe_clown:881911897237123133")); // Krozo
+        userReactionMap.put(349654731305779231L, List.of("<:child_mortality:921550210260434994")); // Mickey
+        userReactionMap.put(671008061938204685L, List.of("<:snailbob:938390896884461648")); // Angry Lady
+        userReactionMap.put(661924517173657622L, List.of("\uD83D\uDCE2", "\uD83D\uDCA8")); // baZoo
+    }
 
     public MessageListener(final User selfUser) {
         this.selfUser = selfUser;
@@ -39,6 +46,11 @@ public class MessageListener extends ListenerAdapter {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final Message message = event.getMessage();
             try {
+                if (userReactionMap.containsKey(event.getAuthor().getIdLong())) {
+                    userReactionMap.get(event.getAuthor().getIdLong()). // Emoji List
+                            forEach(emoji -> message.addReaction(emoji).complete());
+                }
+
                 final String rawText = message.getContentRaw();
 
                 final long guildId = event.getGuild().getIdLong();
