@@ -15,17 +15,17 @@ import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
 
-    private final static Map<Long, List<String>> userReactionMap;
+    private final static Map<Long, List<String>> USER_REACTION_MAP;
     private final User selfUser;
     private final Map<Long, Boolean> smileMap;
 
     static {
-        userReactionMap = new HashMap<>();
+        USER_REACTION_MAP = new HashMap<>();
 
-        userReactionMap.put(243411239861092352L, List.of("<:pepe_clown:881911897237123133")); // Krozo
-        userReactionMap.put(349654731305779231L, List.of("<:child_mortality:921550210260434994")); // Mickey
-        userReactionMap.put(671008061938204685L, List.of("<:snailbob:938390896884461648")); // Angry Lady
-        userReactionMap.put(661924517173657622L, List.of("\uD83D\uDCE2", "\uD83D\uDCA8")); // baZoo
+        USER_REACTION_MAP.put(243411239861092352L, List.of("<:pepe_clown:881911897237123133")); // Krozo
+        USER_REACTION_MAP.put(349654731305779231L, List.of("<:child_mortality:921550210260434994")); // Mickey
+        USER_REACTION_MAP.put(671008061938204685L, List.of("<:snailbob:938390896884461648")); // Angry Lady
+        USER_REACTION_MAP.put(661924517173657622L, List.of("\uD83D\uDCE2", "\uD83D\uDCA8")); // baZoo
     }
 
     public MessageListener(final User selfUser) {
@@ -46,10 +46,8 @@ public class MessageListener extends ListenerAdapter {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final Message message = event.getMessage();
             try {
-                if (userReactionMap.containsKey(event.getAuthor().getIdLong())) {
-                    userReactionMap.get(event.getAuthor().getIdLong()). // Emoji List
-                            forEach(emoji -> message.addReaction(emoji).complete());
-                }
+                USER_REACTION_MAP.getOrDefault(event.getAuthor().getIdLong(), Collections.emptyList()). // Emoji List
+                        forEach(emoji -> message.addReaction(emoji).complete());
 
                 final String rawText = message.getContentRaw();
 
