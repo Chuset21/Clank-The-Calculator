@@ -17,7 +17,7 @@ public class MessageListener extends ListenerAdapter {
 
     private final static Map<Long, List<String>> USER_REACTION_MAP;
     private final User selfUser;
-    private final Map<Long, Boolean> smileMap;
+    private static final Map<Long, Set<String>> GUILD_EMOJI_MAP = new HashMap<>(); // Command -> '!set <emoji> (on|off)
 
     static {
         USER_REACTION_MAP = new HashMap<>();
@@ -31,7 +31,6 @@ public class MessageListener extends ListenerAdapter {
 
     public MessageListener(final User selfUser) {
         this.selfUser = selfUser;
-        smileMap = new HashMap<>();
     }
 
     private static final RuntimeException MATCHER_ERROR =
@@ -54,15 +53,27 @@ public class MessageListener extends ListenerAdapter {
 
                 final long guildId = event.getGuild().getIdLong();
                 final String lowercase = rawText.toLowerCase(Locale.ROOT);
-                if (lowercase.contains("smile on")) {
-                    smileMap.put(guildId, true);
-                } else if (lowercase.contains("smile off")) {
-                    smileMap.put(guildId, false);
+
+                if (lowercase.matches("^!set .*\\s+on$")) {
+                    GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
+                        if (v == null) {
+                            v = new HashSet<>();
+                        }
+                        v.add(lowercase.replace(" on", "").
+                                replace(">", "").replace("!set ", ""));
+                        return v;
+                    });
+                } else if (lowercase.matches("^!set .*\\s+off$")) {
+                    GUILD_EMOJI_MAP.computeIfPresent(guildId, (k, v) -> {
+                        v.remove(lowercase.
+                                replace(" off", "").
+                                replace(">", "").replace("!set ", ""));
+                        return v;
+                    });
                 }
 
-                if (smileMap.getOrDefault(guildId, false)) {
-                    message.addReaction("\uD83D\uDE42").complete();
-                }
+                GUILD_EMOJI_MAP.getOrDefault(guildId, Collections.emptySet()).
+                        forEach(emote -> message.addReaction(emote).complete());
 
                 if (message.isMentioned(selfUser)) {
                     if (rawText.contains(DM)) {
