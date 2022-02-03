@@ -68,7 +68,7 @@ public class MessageListener extends ListenerAdapter {
                     replace(">", "").replace("!set ", "");
 
             if (lowercase.matches("^!set\\s+.*\\s+on.*")) {
-                final String emoji = emojiCommand.replace(" on", "").trim();
+                final String emoji = emojiCommand.replace("on", "").trim();
 
                 if (!mentionedUsers.isEmpty()) {
                     mentionedUsers.forEach(id -> USER_REACTION_MAP.compute(id, (k, v) -> {
