@@ -1,6 +1,7 @@
 package org.chuset.discord;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -13,8 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MessageListener extends ListenerAdapter {
+public class Handler extends ListenerAdapter {
 
+    private final static long KROZO_ID = 243411239861092352L;
     private final static Map<Long, List<String>> USER_REACTION_MAP;
     private final User selfUser;
     private static final Map<Long, Set<String>> GUILD_EMOJI_MAP = new HashMap<>(); // Command -> '!set <emoji> (on|off) ?(users)
@@ -22,7 +24,7 @@ public class MessageListener extends ListenerAdapter {
     static {
         USER_REACTION_MAP = new HashMap<>();
 
-        USER_REACTION_MAP.put(243411239861092352L, new ArrayList<>() {{
+        USER_REACTION_MAP.put(KROZO_ID, new ArrayList<>() {{
             add("<:pepe_clown:881911897237123133");
         }}); // Krozo
         USER_REACTION_MAP.put(349654731305779231L, new ArrayList<>() {{
@@ -43,13 +45,29 @@ public class MessageListener extends ListenerAdapter {
         }}); // Kiwi
     }
 
-    public MessageListener(final User selfUser) {
+    public Handler(final User selfUser) {
         this.selfUser = selfUser;
     }
 
     private static final RuntimeException MATCHER_ERROR =
             new RuntimeException("Provide the text to be sent and the number of times for it to be repeated.");
     private static final String DM = "-dm";
+
+    @Override
+    public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+        final User user = event.getMember().getUser();
+        if (user.getIdLong() == KROZO_ID) {
+            event.getMember().deafen(true).complete();
+
+            final int randomInt = new Random().nextInt(5);
+            if (randomInt == 0) {
+                final VoiceChannel tomasGettingKicked =
+                        event.getGuild().createVoiceChannel("Tomas getting kicked").complete();
+                event.getGuild().moveVoiceMember(event.getMember(), tomasGettingKicked).complete();
+                tomasGettingKicked.delete().complete();
+            }
+        }
+    }
 
     @Override
     public void onMessageReceived(final @NotNull MessageReceivedEvent event) {

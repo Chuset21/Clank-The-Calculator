@@ -15,6 +15,6 @@ public class BotMain {
                 .setMemberCachePolicy(MemberCachePolicy.ALL) // ignored if chunking enabled
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build();
-        jda.addEventListener(new MessageListener(jda.getSelfUser()));
+        jda.addEventListener(new Handler(jda.getSelfUser()));
     }
 }
