@@ -1,15 +1,17 @@
 package org.chuset.discord;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -55,19 +57,48 @@ public class Handler extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
-        final User user = event.getMember().getUser();
-        if (user.getIdLong() == KROZO_ID) {
-            event.getMember().deafen(true).complete();
+        final Member member = event.getMember();
+        final Guild guild = event.getGuild();
+        final Random r = new Random();
 
-            final int randomInt = new Random().nextInt(5);
-            if (randomInt == 0) {
-                final VoiceChannel tomasGettingKicked =
-                        event.getGuild().createVoiceChannel("Tomas getting kicked").complete();
-                event.getGuild().moveVoiceMember(event.getMember(), tomasGettingKicked).complete();
-                tomasGettingKicked.delete().complete();
-            }
+        if (r.nextInt(5) == 0) {
+            final VoiceChannel vcKick = guild.createVoiceChannel(
+                    String.format("bye bye %s -%d", member.getNickname(), r.nextLong())).complete();
+            guild.moveVoiceMember(event.getMember(), vcKick).complete();
+            vcKick.delete().completeAfter(1, TimeUnit.SECONDS);
         }
     }
+
+//    @Override
+//    public void onGuildVoiceMove(@Nonnull GuildVoiceMoveEvent event) {
+//        final Member member = event.getMember();
+//        final Guild guild = event.getGuild();
+//        final Random r = new Random();
+//
+//        if (!event.getChannelJoined().getName().contains("bye bye") &&
+//                event.getMember().getUser().getIdLong() == KROZO_ID) {
+//            final VoiceChannel vcKick = guild.createVoiceChannel(
+//                    String.format("bye bye %s -%d", member.getNickname(), r.nextLong())).complete();
+//            guild.moveVoiceMember(event.getMember(), vcKick).complete();
+//
+//            guild.moveVoiceMember(event.getMember(), event.getChannelJoined()).completeAfter(100, TimeUnit.MILLISECONDS);
+//            vcKick.delete().complete();
+//        }
+//    }
+
+//    @Override
+//    public void onGuildVoiceDeafen(@Nonnull GuildVoiceDeafenEvent event) {
+//        if (event.getMember().getUser().getIdLong() == KROZO_ID) {
+//            event.getMember().deafen(!event.isDeafened()).completeAfter(1, TimeUnit.SECONDS);
+//        }
+//    }
+//
+//    @Override
+//    public void onGuildVoiceGuildMute(@Nonnull GuildVoiceGuildMuteEvent event) {
+//        if (event.getMember().getUser().getIdLong() == KROZO_ID) {
+//            event.getMember().mute(!event.isGuildMuted()).completeAfter(1, TimeUnit.SECONDS);
+//        }
+//    }
 
     @Override
     public void onMessageReceived(final @NotNull MessageReceivedEvent event) {
