@@ -138,12 +138,12 @@ public class Handler extends ListenerAdapter {
             if (equalsGivenCommand(Command.ON, option)) {
                 DELETE_USER_MESSAGE_SET.addAll(mentionedUsers);
                 event.getChannel().sendMessage("Deleting all further messages from %s.".
-                        formatted(event.getMessage().getMentionedMembers().stream().map(Member::getNickname).
+                        formatted(mentionedUsers.stream().map(User::getName).
                                 collect(Collectors.joining(", ")))).complete();
             } else if (equalsGivenCommand(Command.OFF, option)) {
                 mentionedUsers.forEach(DELETE_USER_MESSAGE_SET::remove);
                 event.getChannel().sendMessage("Giving %s a chance to speak.".
-                        formatted(event.getMessage().getMentionedMembers().stream().map(Member::getNickname).
+                        formatted(mentionedUsers.stream().map(User::getName).
                                 collect(Collectors.joining(", ")))).complete();
             } else {
                 event.getMessage().reply("Options for this command are: %s or %s".
