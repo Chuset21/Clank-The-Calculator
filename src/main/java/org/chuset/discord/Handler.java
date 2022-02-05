@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
@@ -18,14 +17,20 @@ import java.util.stream.Collectors;
 
 public class Handler extends ListenerAdapter {
 
+    private static final String MENTION_REGEX = "<@.\\d+>";
+    private static final String PATTERN = "^%s\\s+%s\\s+.*\\s*.*";
+    private final static long CHUSET_ID = 241245334767009793L;
     private final static long KROZO_ID = 243411239861092352L;
-    private final static Map<Long, List<String>> USER_REACTION_MAP;
+    private static final RuntimeException MATCHER_ERROR =
+            new RuntimeException("Provide the text to be sent and the number of times for it to be repeated.");
+
     private final User selfUser;
+    private final static Set<User> DELETE_USER_MESSAGE_SET = new HashSet<>();
+    private final static Map<Long, List<String>> USER_REACTION_MAP = new HashMap<>();
+    private static final Map<Command, Set<String>> COMMAND_LIST_MAP = new HashMap<>();
     private static final Map<Long, Set<String>> GUILD_EMOJI_MAP = new HashMap<>(); // Command -> '!set <emoji> (on|off) ?(users)
 
     static {
-        USER_REACTION_MAP = new HashMap<>();
-
         USER_REACTION_MAP.put(KROZO_ID, new ArrayList<>() {{
             add("<:pepe_clown:881911897237123133");
         }}); // Krozo
@@ -45,15 +50,38 @@ public class Handler extends ListenerAdapter {
         USER_REACTION_MAP.put(195633376701579264L, new ArrayList<>() {{
             add("\uD83E\uDD5D");
         }}); // Kiwi
+
+        COMMAND_LIST_MAP.put(Command.DM, new HashSet<>() {{
+            add("-dm");
+        }});
+        COMMAND_LIST_MAP.put(Command.SET, new HashSet<>() {{
+            add("-set");
+        }});
+        COMMAND_LIST_MAP.put(Command.ON, new HashSet<>() {{
+            add("-on");
+            add("-true");
+        }});
+        COMMAND_LIST_MAP.put(Command.OFF, new HashSet<>() {{
+            add("-off");
+            add("-false");
+        }});
+        COMMAND_LIST_MAP.put(Command.DELETE, new HashSet<>() {{
+            add("-del");
+            add("-delete");
+        }});
+    }
+
+    private enum Command {
+        SET,
+        DM,
+        ON,
+        OFF,
+        DELETE
     }
 
     public Handler(final User selfUser) {
         this.selfUser = selfUser;
     }
-
-    private static final RuntimeException MATCHER_ERROR =
-            new RuntimeException("Provide the text to be sent and the number of times for it to be repeated.");
-    private static final String DM = "-dm";
 
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
@@ -63,7 +91,7 @@ public class Handler extends ListenerAdapter {
 
         if (r.nextInt(5) == 0) {
             final VoiceChannel vcKick = guild.createVoiceChannel(
-                    String.format("bye bye %s -%d", member.getNickname(), r.nextLong())).complete();
+                    "bye bye %s %d".formatted(member.getNickname(), r.nextLong())).complete();
             guild.moveVoiceMember(event.getMember(), vcKick).complete();
             vcKick.delete().completeAfter(1, TimeUnit.SECONDS);
         }
@@ -100,55 +128,94 @@ public class Handler extends ListenerAdapter {
 //        }
 //    }
 
+    private void handleDeleteMessageCommand(MessageReceivedEvent event, String commandString) {
+        if (event.getAuthor().getIdLong() == CHUSET_ID) {
+            final String option = deleteCommand(Command.SET, deleteCommand(Command.DELETE, commandString)).
+                    replaceAll(MENTION_REGEX, "").trim();
+
+            final List<User> mentionedUsers = getMentionedUsersBarSelfUser(event.getMessage());
+
+            if (equalsGivenCommand(Command.ON, option)) {
+                DELETE_USER_MESSAGE_SET.addAll(mentionedUsers);
+                event.getChannel().sendMessage("Deleting all further messages from %s.".
+                        formatted(event.getMessage().getMentionedMembers().stream().map(Member::getNickname).
+                                collect(Collectors.joining(", ")))).complete();
+            } else if (equalsGivenCommand(Command.OFF, option)) {
+                mentionedUsers.forEach(DELETE_USER_MESSAGE_SET::remove);
+                event.getChannel().sendMessage("Giving %s a chance to speak.".
+                        formatted(event.getMessage().getMentionedMembers().stream().map(Member::getNickname).
+                                collect(Collectors.joining(", ")))).complete();
+            } else {
+                event.getMessage().reply("Options for this command are: %s or %s".
+                        formatted(buildCommandRegex(Command.ON), buildCommandRegex(Command.OFF))).complete();
+            }
+        } else {
+            event.getMessage().reply("You do not have permissions to use this command.").complete();
+        }
+    }
+
+    private void deleteUserMessage(MessageReceivedEvent event) {
+        if (DELETE_USER_MESSAGE_SET.contains(event.getAuthor())) {
+            try {
+                event.getMessage().delete().queue();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean startsWithGivenCommand(Command command, String string) {
+        return COMMAND_LIST_MAP.get(command).stream().anyMatch(string::startsWith);
+    }
+
+    private boolean equalsGivenCommand(Command command, String string) {
+        return COMMAND_LIST_MAP.get(command).stream().anyMatch(string::equals);
+    }
+
+    private boolean containsGivenCommand(Command command, String string) {
+        return COMMAND_LIST_MAP.get(command).stream().anyMatch(string::contains);
+    }
+
+    private String buildCommandRegex(Command command) {
+        return "(%s)".formatted(String.join("|", COMMAND_LIST_MAP.get(command)));
+    }
+
+    private String replaceCommand(Command command, String string, String replacement) {
+        String result = string;
+
+        for (String target : COMMAND_LIST_MAP.get(command)) {
+            result = result.replace(target, replacement);
+        }
+
+        return result;
+    }
+
+    private String deleteCommand(Command command, String string) {
+        return replaceCommand(command, string, "");
+    }
+
     @Override
     public void onMessageReceived(final @NotNull MessageReceivedEvent event) {
         final Message message = event.getMessage();
-        final String rawText = message.getContentRaw();
-        final String lowercase = rawText.toLowerCase(Locale.ROOT);
+        final String lowercaseText = message.getContentRaw().toLowerCase(Locale.ROOT);
 
         final long guildId = event.getGuild().getIdLong();
 
-        if (lowercase.startsWith("!set")) {
-            final List<Long> mentionedUsers = message.getMentionedUsers().stream().
-                    map(User::getIdLong).
-                    collect(Collectors.toList());
-
-            final String emojiCommand = lowercase.replaceAll("<@.\\d+>", "").
-                    replace(">", "").replace("!set ", "");
-
-            if (lowercase.matches("^!set\\s+.*\\s+on.*")) {
-                final String emoji = emojiCommand.replace("on", "").trim();
-
-                if (!mentionedUsers.isEmpty()) {
-                    mentionedUsers.forEach(id -> USER_REACTION_MAP.compute(id, (k, v) -> {
-                        if (v == null) {
-                            v = new ArrayList<>();
-                        }
-                        v.add(emoji);
-                        return v;
-                    }));
-                } else {
-                    GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
-                        if (v == null) {
-                            v = new HashSet<>();
-                        }
-                        v.add(emoji);
-                        return v;
-                    });
-                }
-            } else if (lowercase.matches("^!set .*\\s+off.*")) {
-                final String emoji = emojiCommand.replace("off", "").trim();
-
-                if (!mentionedUsers.isEmpty()) {
-                    mentionedUsers.forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
-                } else {
-                    GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).remove(emoji);
-                }
+        if (startsWithGivenCommand(Command.SET, lowercaseText)) {
+            if (containsGivenCommand(Command.DELETE, lowercaseText)) {
+                handleDeleteMessageCommand(event, lowercaseText);
+            } else {
+                mutateReactionMaps(message, lowercaseText, guildId);
             }
         } else {
             new Thread(() -> harass(event)).start();
         }
 
+        reactWithReactionMaps(event, message, guildId);
+        deleteUserMessage(event);
+    }
+
+    private void reactWithReactionMaps(@NotNull MessageReceivedEvent event, Message message, long guildId) {
         try {
             USER_REACTION_MAP.getOrDefault(event.getAuthor().getIdLong(), Collections.emptyList()). // Emoji List
                     forEach(emoji -> message.addReaction(emoji).complete());
@@ -172,6 +239,46 @@ public class Handler extends ListenerAdapter {
         }
     }
 
+    private void mutateReactionMaps(Message message, String lowercase, long guildId) {
+        final List<Long> mentionedUsers = message.getMentionedUsers().stream().
+                map(User::getIdLong).
+                collect(Collectors.toList());
+
+        final String emojiCommand = deleteCommand(Command.SET,
+                lowercase.replaceAll("<@.\\d+>", "").replace(">", ""));
+
+        if (lowercase.matches(PATTERN.formatted(buildCommandRegex(Command.SET), buildCommandRegex(Command.ON)))) {
+            final String emoji = deleteCommand(Command.ON, emojiCommand).trim();
+
+            if (!mentionedUsers.isEmpty()) {
+                mentionedUsers.forEach(id -> USER_REACTION_MAP.compute(id, (k, v) -> {
+                    if (v == null) {
+                        v = new ArrayList<>();
+                    }
+                    v.add(emoji);
+                    return v;
+                }));
+            } else {
+                GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
+                    if (v == null) {
+                        v = new HashSet<>();
+                    }
+                    v.add(emoji);
+                    return v;
+                });
+            }
+        } else if (lowercase.matches(PATTERN.
+                formatted(buildCommandRegex(Command.SET), buildCommandRegex(Command.OFF)))) {
+            final String emoji = deleteCommand(Command.OFF, emojiCommand).trim();
+
+            if (!mentionedUsers.isEmpty()) {
+                mentionedUsers.forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
+            } else {
+                GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).remove(emoji);
+            }
+        }
+    }
+
     public void harass(final MessageReceivedEvent event) {
         if (selfUser.getIdLong() != event.getAuthor().getIdLong()) {
             final Message message = event.getMessage();
@@ -179,14 +286,11 @@ public class Handler extends ListenerAdapter {
                 final String rawText = message.getContentRaw();
 
                 if (message.isMentioned(selfUser)) {
-                    if (rawText.contains(DM)) {
-                        final List<User> mentionedUsers = message.getMentionedMembers().stream().
-                                map(Member::getUser).
-                                filter(u -> u.getIdLong() != selfUser.getIdLong()).
-                                collect(Collectors.toList());
+                    if (containsGivenCommand(Command.DM, rawText)) {
+                        final List<User> mentionedUsers = getMentionedUsersBarSelfUser(message);
 
                         final Matcher m = Pattern.compile("^([\\s\\S]*)\\s+(\\d+)$").matcher(
-                                rawText.replace(DM, "").replaceAll("<@.\\d+>", "").trim());
+                                deleteCommand(Command.DM, rawText).replaceAll(MENTION_REGEX, "").trim());
                         if (!m.find() || m.groupCount() != 2) {
                             throw MATCHER_ERROR;
                         }
@@ -233,5 +337,13 @@ public class Handler extends ListenerAdapter {
                 }
             }
         }
+    }
+
+    @NotNull
+    private List<User> getMentionedUsersBarSelfUser(Message message) {
+        return message.getMentionedMembers().stream().
+                map(Member::getUser).
+                filter(u -> u.getIdLong() != selfUser.getIdLong()).
+                collect(Collectors.toList());
     }
 }
