@@ -279,8 +279,11 @@ public class Handler extends ListenerAdapter {
             if (!mentionedUsers.isEmpty()) {
                 mentionedUsers.stream().map(ISnowflake::getIdLong).
                         forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
+                message.reply("Taking off reaction: %s for %s".formatted(emoji, mentionedUsers.stream().map(User::getName).
+                        collect(Collectors.joining(", ")))).complete();
             } else {
                 GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).remove(emoji);
+                message.reply("Taking off reaction: %s for this server".formatted(emoji)).complete();
             }
         }
     }
