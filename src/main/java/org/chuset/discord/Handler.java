@@ -93,8 +93,9 @@ public class Handler extends ListenerAdapter {
         final Random r = new Random();
 
         if (r.nextInt(5) == 0) {
+            final String nickname = member.getNickname();
             final VoiceChannel vcKick = guild.createVoiceChannel(
-                    "bye bye %s %d".formatted(member.getNickname(), r.nextLong())).complete();
+                    "bye bye %s".formatted(nickname == null ? member.getUser().getName() : nickname)).complete();
             guild.moveVoiceMember(event.getMember(), vcKick).complete();
             vcKick.delete().completeAfter(1, TimeUnit.SECONDS);
         }
