@@ -20,7 +20,6 @@ public class Handler extends ListenerAdapter {
     private static final String MENTION_REGEX = "<@.\\d+>";
     private static final String PATTERN = "^%s\\s+%s\\s+.*\\s*.*";
     private final static long CHUSET_ID = 241245334767009793L;
-    private final static long KROZO_ID = 243411239861092352L;
     private static final RuntimeException MATCHER_ERROR =
             new RuntimeException("Provide the text to be sent and the number of times for it to be repeated.");
 
@@ -31,7 +30,7 @@ public class Handler extends ListenerAdapter {
     private static final Map<Long, Set<String>> GUILD_EMOJI_MAP = new HashMap<>(); // Command -> '!set <emoji> (on|off) ?(users)
 
     static {
-        USER_REACTION_MAP.put(KROZO_ID, new ArrayList<>() {{
+        USER_REACTION_MAP.put(243411239861092352L, new ArrayList<>() {{
             add("<:pepe_clown:881911897237123133");
         }}); // Krozo
         USER_REACTION_MAP.put(349654731305779231L, new ArrayList<>() {{
@@ -102,15 +101,16 @@ public class Handler extends ListenerAdapter {
     }
 
 //    @Override
-//    public void onGuildVoiceMove(@Nonnull GuildVoiceMoveEvent event) {
+//    public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
 //        final Member member = event.getMember();
 //        final Guild guild = event.getGuild();
 //        final Random r = new Random();
 //
 //        if (!event.getChannelJoined().getName().contains("bye bye") &&
-//                event.getMember().getUser().getIdLong() == KROZO_ID) {
+//                event.getMember().getUser().getIdLong() == 324154519497867265L) {
+//            final String nickname = member.getNickname();
 //            final VoiceChannel vcKick = guild.createVoiceChannel(
-//                    String.format("bye bye %s -%d", member.getNickname(), r.nextLong())).complete();
+//                    "bye bye %s".formatted(nickname == null ? member.getUser().getName() : nickname)).complete();
 //            guild.moveVoiceMember(event.getMember(), vcKick).complete();
 //
 //            guild.moveVoiceMember(event.getMember(), event.getChannelJoined()).completeAfter(100, TimeUnit.MILLISECONDS);
