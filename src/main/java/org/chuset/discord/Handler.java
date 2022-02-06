@@ -55,19 +55,22 @@ public class Handler extends ListenerAdapter {
             add("-dm");
         }});
         COMMAND_LIST_MAP.put(Command.SET, new HashSet<>() {{
-            add("-set");
+            add("--set");
+            add("-s");
         }});
         COMMAND_LIST_MAP.put(Command.ON, new HashSet<>() {{
-            add("-on");
-            add("-true");
+            add("--on");
+            add("--true");
+            add("-t");
         }});
         COMMAND_LIST_MAP.put(Command.OFF, new HashSet<>() {{
-            add("-off");
-            add("-false");
+            add("--off");
+            add("--false");
+            add("-f");
         }});
         COMMAND_LIST_MAP.put(Command.DELETE, new HashSet<>() {{
-            add("-del");
-            add("-delete");
+            add("--delete");
+            add("-d");
         }});
     }
 
@@ -240,9 +243,7 @@ public class Handler extends ListenerAdapter {
     }
 
     private void mutateReactionMaps(Message message, String lowercase, long guildId) {
-        final List<Long> mentionedUsers = message.getMentionedUsers().stream().
-                map(User::getIdLong).
-                collect(Collectors.toList());
+        final List<User> mentionedUsers = new ArrayList<>(message.getMentionedUsers());
 
         final String emojiCommand = deleteCommand(Command.SET,
                 lowercase.replaceAll("<@.\\d+>", "").replace(">", ""));
@@ -251,13 +252,16 @@ public class Handler extends ListenerAdapter {
             final String emoji = deleteCommand(Command.ON, emojiCommand).trim();
 
             if (!mentionedUsers.isEmpty()) {
-                mentionedUsers.forEach(id -> USER_REACTION_MAP.compute(id, (k, v) -> {
-                    if (v == null) {
-                        v = new ArrayList<>();
-                    }
-                    v.add(emoji);
-                    return v;
-                }));
+                mentionedUsers.stream().map(ISnowflake::getIdLong).
+                        forEach(id -> USER_REACTION_MAP.compute(id, (k, v) -> {
+                            if (v == null) {
+                                v = new ArrayList<>();
+                            }
+                            v.add(emoji);
+                            return v;
+                        }));
+                message.reply("Setting reaction: %s for %s".formatted(emoji, mentionedUsers.stream().map(User::getName).
+                        collect(Collectors.joining(", ")))).complete();
             } else {
                 GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
                     if (v == null) {
@@ -266,13 +270,15 @@ public class Handler extends ListenerAdapter {
                     v.add(emoji);
                     return v;
                 });
+                message.reply("Setting reaction: %s for this server".formatted(emoji)).complete();
             }
         } else if (lowercase.matches(PATTERN.
                 formatted(buildCommandRegex(Command.SET), buildCommandRegex(Command.OFF)))) {
             final String emoji = deleteCommand(Command.OFF, emojiCommand).trim();
 
             if (!mentionedUsers.isEmpty()) {
-                mentionedUsers.forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
+                mentionedUsers.stream().map(ISnowflake::getIdLong).
+                        forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
             } else {
                 GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).remove(emoji);
             }
