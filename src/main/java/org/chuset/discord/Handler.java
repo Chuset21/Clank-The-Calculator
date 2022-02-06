@@ -251,6 +251,7 @@ public class Handler extends ListenerAdapter {
 
         if (lowercase.matches(PATTERN.formatted(buildCommandRegex(Command.SET), buildCommandRegex(Command.ON)))) {
             final String emoji = deleteCommand(Command.ON, emojiCommand).trim();
+            final String fullEmoji = emoji + (emoji.startsWith("<") ? "" : ">");
 
             if (!mentionedUsers.isEmpty()) {
                 mentionedUsers.stream().map(ISnowflake::getIdLong).
@@ -261,7 +262,8 @@ public class Handler extends ListenerAdapter {
                             v.add(emoji);
                             return v;
                         }));
-                message.reply("Setting reaction: %s for %s".formatted(emoji, mentionedUsers.stream().map(User::getName).
+                message.reply("Setting reaction: %s for %s".formatted(fullEmoji,
+                        mentionedUsers.stream().map(User::getName).
                         collect(Collectors.joining(", ")))).complete();
             } else {
                 GUILD_EMOJI_MAP.compute(guildId, (k, v) -> {
@@ -271,20 +273,22 @@ public class Handler extends ListenerAdapter {
                     v.add(emoji);
                     return v;
                 });
-                message.reply("Setting reaction: %s for this server".formatted(emoji)).complete();
+                message.reply("Setting reaction: %s for this server".formatted(fullEmoji)).complete();
             }
         } else if (lowercase.matches(PATTERN.
                 formatted(buildCommandRegex(Command.SET), buildCommandRegex(Command.OFF)))) {
             final String emoji = deleteCommand(Command.OFF, emojiCommand).trim();
+            final String fullEmoji = emoji + (emoji.startsWith("<") ? "" : ">");
 
             if (!mentionedUsers.isEmpty()) {
                 mentionedUsers.stream().map(ISnowflake::getIdLong).
                         forEach(id -> USER_REACTION_MAP.getOrDefault(id, new ArrayList<>()).remove(emoji));
-                message.reply("Taking off reaction: %s for %s".formatted(emoji, mentionedUsers.stream().map(User::getName).
+                message.reply("Taking off reaction: %s for %s".formatted(fullEmoji,
+                        mentionedUsers.stream().map(User::getName).
                         collect(Collectors.joining(", ")))).complete();
             } else {
                 GUILD_EMOJI_MAP.getOrDefault(guildId, new HashSet<>()).remove(emoji);
-                message.reply("Taking off reaction: %s for this server".formatted(emoji)).complete();
+                message.reply("Taking off reaction: %s for this server".formatted(fullEmoji)).complete();
             }
         }
     }
